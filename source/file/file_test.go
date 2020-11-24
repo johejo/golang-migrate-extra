@@ -46,8 +46,49 @@ func Test(t *testing.T) {
 	st.TestFirst(t, d)
 	st.TestPrev(t, d)
 	st.TestNext(t, d)
-	st.TestReadUp(t, d)
+	testReadUp(t, d)
 	testReadDown(t, d)
+}
+
+// from github.com/golang-migrate/migrate/v4/source/testing#TestReadUp
+func testReadUp(t *testing.T, d source.Driver) {
+	tt := []struct {
+		version   uint
+		expectErr error
+		expectUp  bool
+	}{
+		{version: 0, expectErr: os.ErrNotExist},
+		{version: 1, expectErr: nil, expectUp: true},
+		{version: 2, expectErr: os.ErrNotExist},
+		{version: 3, expectErr: nil, expectUp: true},
+		{version: 4, expectErr: nil, expectUp: true},
+		{version: 5, expectErr: os.ErrNotExist},
+		{version: 6, expectErr: os.ErrNotExist},
+		{version: 7, expectErr: nil, expectUp: true},
+		{version: 8, expectErr: os.ErrNotExist},
+	}
+
+	for i, v := range tt {
+		up, identifier, err := d.ReadUp(v.version)
+		if (v.expectErr == os.ErrNotExist && !errors.Is(err, os.ErrNotExist)) ||
+			(v.expectErr != os.ErrNotExist && err != v.expectErr) {
+			t.Errorf("expected %v, got %v, in %v", v.expectErr, err, i)
+
+		} else if err == nil {
+			if len(identifier) == 0 {
+				t.Errorf("expected identifier not to be empty, in %v", i)
+			}
+
+			if v.expectUp && up == nil {
+				t.Errorf("expected up not to be nil, in %v", i)
+			} else if !v.expectUp && up != nil {
+				t.Errorf("expected up to be nil, got %v, in %v", up, i)
+			}
+		}
+		if up != nil {
+			defer up.Close()
+		}
+	}
 }
 
 // from github.com/golang-migrate/migrate/v4/source/testing#TestReadDown
