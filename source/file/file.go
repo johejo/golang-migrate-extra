@@ -1,6 +1,7 @@
 // +build go1.16
 //go:build go1.16
 
+// Package file provides source.Driver for local file system.
 package file
 
 import (
