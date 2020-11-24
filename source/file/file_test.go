@@ -36,6 +36,11 @@ func Test(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Log(err)
+		}
+	})
 
 	st.Test(t, d)
 }
@@ -51,10 +56,15 @@ func TestOpen(t *testing.T) {
 	}
 
 	f := &File{}
-	_, err := f.Open("file://" + tmpDir) // absolute path
+	d, err := f.Open("file://" + tmpDir) // absolute path
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Log(err)
+		}
+	})
 }
 
 func TestOpenWithRelativePath(t *testing.T) {
@@ -98,6 +108,11 @@ func TestOpenWithRelativePath(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Log(err)
+		}
+	})
 	_, err = d.First()
 	if err != nil {
 		t.Fatalf("expected first file in working dir %v for ./foo", tmpDir)
@@ -115,6 +130,11 @@ func TestOpenDefaultsToCurrentDirectory(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			t.Log(err)
+		}
+	})
 
 	if d.(*File).path != wd {
 		t.Fatal("expected driver to default to current directory")
@@ -190,6 +210,11 @@ func BenchmarkNext(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	b.Cleanup(func() {
+		if err := d.Close(); err != nil {
+			b.Log(err)
+		}
+	})
 	b.ResetTimer()
 	v, err := d.First()
 	for n := 0; n < b.N; n++ {
