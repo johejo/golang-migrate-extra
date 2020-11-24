@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/golang-migrate/migrate/v4/source"
 	st "github.com/golang-migrate/migrate/v4/source/testing"
 )
 
@@ -42,7 +43,51 @@ func Test(t *testing.T) {
 		}
 	})
 
-	st.Test(t, d)
+	st.TestFirst(t, d)
+	st.TestPrev(t, d)
+	st.TestNext(t, d)
+	st.TestReadUp(t, d)
+	testReadDown(t, d)
+}
+
+// from github.com/golang-migrate/migrate/v4/source/testing#TestReadDown
+func testReadDown(t *testing.T, d source.Driver) {
+	tt := []struct {
+		version    uint
+		expectErr  error
+		expectDown bool
+	}{
+		{version: 0, expectErr: os.ErrNotExist},
+		{version: 1, expectErr: nil, expectDown: true},
+		{version: 2, expectErr: os.ErrNotExist},
+		{version: 3, expectErr: os.ErrNotExist},
+		{version: 4, expectErr: nil, expectDown: true},
+		{version: 5, expectErr: nil, expectDown: true},
+		{version: 6, expectErr: os.ErrNotExist},
+		{version: 7, expectErr: nil, expectDown: true},
+		{version: 8, expectErr: os.ErrNotExist},
+	}
+
+	for i, v := range tt {
+		down, identifier, err := d.ReadDown(v.version)
+		if (v.expectErr == os.ErrNotExist && !errors.Is(err, os.ErrNotExist)) ||
+			(v.expectErr != os.ErrNotExist && err != v.expectErr) {
+			t.Errorf("expected %v, got %v, in %v", v.expectErr, err, i)
+		} else if err == nil {
+			if len(identifier) == 0 {
+				t.Errorf("expected identifier not to be empty, in %v", i)
+			}
+
+			if v.expectDown && down == nil {
+				t.Errorf("expected down not to be nil, in %v", i)
+			} else if !v.expectDown && down != nil {
+				t.Errorf("expected down to be nil, got %v, in %v", down, i)
+			}
+		}
+		if down != nil {
+			defer down.Close()
+		}
+	}
 }
 
 func TestOpen(t *testing.T) {
