@@ -12,15 +12,6 @@ defaults:
   run:
     shell: bash
 jobs:
-  golangci-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          version: v1.32
-          args: "./..."
   test:
     strategy:
       matrix:
@@ -32,6 +23,10 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.15.x'
+      - name: golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.32.2
+          golangci-lint run -v ./...
       - name: install tip
         run: |
           git clone --depth=1 https://go.googlesource.com/go $HOME/gotip
