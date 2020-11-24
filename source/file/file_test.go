@@ -16,7 +16,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	tmpDir := t.TempDir()
+	tmpDir := tmpDir(t)
 	// write files that meet driver test requirements
 	mustWriteFile(t, tmpDir, "1_foobar.up.sql", "1 up")
 	mustWriteFile(t, tmpDir, "1_foobar.down.sql", "1 down")
@@ -41,7 +41,7 @@ func Test(t *testing.T) {
 }
 
 func TestOpen(t *testing.T) {
-	tmpDir := t.TempDir()
+	tmpDir := tmpDir(t)
 
 	mustWriteFile(t, tmpDir, "1_foobar.up.sql", "")
 	mustWriteFile(t, tmpDir, "1_foobar.down.sql", "")
@@ -58,7 +58,7 @@ func TestOpen(t *testing.T) {
 }
 
 func TestOpenWithRelativePath(t *testing.T) {
-	tmpDir := t.TempDir()
+	tmpDir := tmpDir(t)
 
 	wd, err := os.Getwd()
 	if err != nil {
@@ -122,7 +122,7 @@ func TestOpenDefaultsToCurrentDirectory(t *testing.T) {
 }
 
 func TestOpenWithDuplicateVersion(t *testing.T) {
-	tmpDir := t.TempDir()
+	tmpDir := tmpDir(t)
 
 	mustWriteFile(t, tmpDir, "1_foo.up.sql", "") // 1 up
 	mustWriteFile(t, tmpDir, "1_bar.up.sql", "") // 1 up
@@ -135,7 +135,7 @@ func TestOpenWithDuplicateVersion(t *testing.T) {
 }
 
 func TestClose(t *testing.T) {
-	tmpDir := t.TempDir()
+	tmpDir := tmpDir(t)
 
 	f := &File{}
 	d, err := f.Open("file://" + tmpDir)
@@ -157,12 +157,17 @@ func mustWriteFile(tb testing.TB, dir, file string, body string) {
 
 func mustCreateBenchmarkDir(b *testing.B) (dir string) {
 	b.Helper()
-	tmpDir := b.TempDir()
+	tmpDir := tmpDir(b)
 	for i := 0; i < 1000; i++ {
 		mustWriteFile(b, tmpDir, fmt.Sprintf("%v_foobar.up.sql", i), "")
 		mustWriteFile(b, tmpDir, fmt.Sprintf("%v_foobar.down.sql", i), "")
 	}
 	return tmpDir
+}
+
+func tmpDir(tb testing.TB) string {
+	tb.Helper()
+	return filepath.ToSlash(tb.TempDir())
 }
 
 func BenchmarkOpen(b *testing.B) {
