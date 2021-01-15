@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -14,6 +15,9 @@ import (
 )
 
 func Test_source_Open(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip()
+	}
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
