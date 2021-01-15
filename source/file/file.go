@@ -14,6 +14,10 @@ import (
 	"github.com/johejo/golang-migrate-extra/source/iofs"
 )
 
+func init() {
+	source.Register("file", &File{})
+}
+
 // File is a source.Driver that reads from local file system.
 type File struct {
 	iofs.PartialDriver
