@@ -12,10 +12,11 @@ import (
 	"github.com/johejo/golang-migrate-extra/source/iofs"
 )
 
+//go:embed testdata/migrations/*.sql
+var fsys embed.FS
+
 func Test(t *testing.T) {
-	//go:embed testdata/migrations/*.sql
-	var fs embed.FS
-	d, err := iofs.New(fs, "testdata/migrations")
+	d, err := iofs.New(fsys, "testdata/migrations")
 	if err != nil {
 		t.Fatal(err)
 	}
