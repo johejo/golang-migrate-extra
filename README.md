@@ -16,7 +16,7 @@ This module is based on [golang-migrate/migrate#472](https://github.com/golang-m
 
 ## Requirements
 
-- Go 1.16 or higher.
+- Go 1.16 or later.
 
 ## License
 
