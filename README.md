@@ -1,5 +1,7 @@
 # golang-migrate-extra
 
+[DEPRECATED] The iofs driver has been incorporated into golang-migrate v4.15.0.
+
 [![ci](https://github.com/johejo/golang-migrate-extra/workflows/ci/badge.svg?branch=main)](https://github.com/johejo/golang-migrate-extra/actions?query=workflow%3Aci)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/johejo/golang-migrate-extra)](https://pkg.go.dev/github.com/johejo/golang-migrate-extra)
 [![codecov](https://codecov.io/gh/johejo/golang-migrate-extra/branch/main/graph/badge.svg)](https://codecov.io/gh/johejo/golang-migrate-extra)
